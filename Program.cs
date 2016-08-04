@@ -5,7 +5,7 @@ using System.ServiceProcess;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RadiusServerService
+namespace Flexinets.Radius
 {
     static class Program
     {
@@ -17,7 +17,7 @@ namespace RadiusServerService
             ServiceBase[] ServicesToRun;
             ServicesToRun = new ServiceBase[]
             {
-                new Service1()
+                new RadiusServerService()
             };
             ServiceBase.Run(ServicesToRun);
         }

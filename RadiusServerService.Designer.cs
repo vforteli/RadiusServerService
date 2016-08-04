@@ -1,6 +1,6 @@
-﻿namespace RadiusServerService
+﻿namespace Flexinets.Radius
 {
-    partial class Service1
+    partial class RadiusServerService
     {
         /// <summary> 
         /// Required designer variable.

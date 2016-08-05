@@ -1,4 +1,5 @@
 ﻿using FlexinetsDBEF;
+using log4net;
 using Microsoft.Azure;
 using System;
 using System.Collections.Generic;
@@ -16,27 +17,38 @@ namespace Flexinets.Radius
 {
     public partial class RadiusServerService : ServiceBase
     {
-        private readonly FlexinetsEntitiesFactory _contextFactory;
+        private FlexinetsEntitiesFactory _contextFactory;
         private RadiusServer _rs;
-        private const String _sharedsecret = "harald";
-        private const int port = 1812;
+        private readonly ILog _log = LogManager.GetLogger(typeof(RadiusServerService));
+
 
         public RadiusServerService()
         {
             InitializeComponent();
-
-            log4net.Config.XmlConfigurator.Configure();
-            _contextFactory = new FlexinetsEntitiesFactory(CloudConfigurationManager.GetSetting("SQLConnectionString"));
         }
 
         protected override void OnStart(string[] args)
         {
-            var path = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\dictionary";  // todo hurgh
-            var dictionary = new RadiusDictionary(path);
+            log4net.Config.XmlConfigurator.Configure();
+            try
+            {
+                _contextFactory = new FlexinetsEntitiesFactory(CloudConfigurationManager.GetSetting("SQLConnectionString"));
 
-            _rs = new RadiusServer(new IPEndPoint(IPAddress.Any, port), dictionary);
-            _rs.AddPacketHandler(IPAddress.Parse("127.0.0.1"), _sharedsecret, new iPassPacketHandler(_contextFactory));
-            _rs.Start();
+                var path = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\dictionary";  // todo hurgh
+                var dictionary = new RadiusDictionary(path);
+
+                var port = Convert.ToInt32(CloudConfigurationManager.GetSetting("Port"));
+                var secret = CloudConfigurationManager.GetSetting("secret");
+                _log.Info("Configuration read");
+                _rs = new RadiusServer(new IPEndPoint(IPAddress.Any, port), dictionary);
+                _rs.AddPacketHandler(IPAddress.Parse("127.0.0.1"), secret, new iPassPacketHandler(_contextFactory));
+                _rs.Start();
+            }
+            catch (Exception ex)
+            {
+                _log.Fatal("Failed to start service", ex);
+                throw;
+            }
         }
 
         protected override void OnStop()

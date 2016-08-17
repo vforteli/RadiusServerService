@@ -1,4 +1,5 @@
-﻿using FlexinetsDBEF;
+﻿using Flexinets.MobileData.SMS;
+using FlexinetsDBEF;
 using log4net;
 using Microsoft.Azure;
 using System;
@@ -41,7 +42,6 @@ namespace Flexinets.Radius
                 var ipassSecret = CloudConfigurationManager.GetSetting("ipasssecret");
                 var mbbSecret = CloudConfigurationManager.GetSetting("mbbsecret");
                 var disconnectCheckerPath = CloudConfigurationManager.GetSetting("DisconnectCheckerPath");
-                var welcomeSenderPath = CloudConfigurationManager.GetSetting("WelcomeSenderPath");
                 var apiUrl = CloudConfigurationManager.GetSetting("ApiUrl");
                 _log.Info("Configuration read");
 
@@ -53,9 +53,15 @@ namespace Flexinets.Radius
                 _rsauth.AddPacketHandler(IPAddress.Parse("127.0.0.1"), ipassSecret, ipassPacketHandler);
                 _rsacct.AddPacketHandler(IPAddress.Parse("127.0.0.1"), ipassSecret, ipassPacketHandler);
 
+                var smsgateway = new SMSGatewayTwilio(
+                    CloudConfigurationManager.GetSetting("twilio.deliveryreporturl"),
+                    CloudConfigurationManager.GetSetting("twilio.accountsid"),
+                    CloudConfigurationManager.GetSetting("twilio.authtoken"));
+
 
                 var networkIdProvider = new NetworkIdProvider(_contextFactory, apiUrl);
-                var mbbPacketHandler = new MobileDataPacketHandler(_contextFactory, networkIdProvider, disconnectCheckerPath, welcomeSenderPath);
+                var welcomeSender = new WelcomeSender(_contextFactory, smsgateway);
+                var mbbPacketHandler = new MobileDataPacketHandler(_contextFactory, networkIdProvider, welcomeSender, disconnectCheckerPath);
 
                 _rsauth.AddPacketHandler(IPAddress.Parse("10.50.0.253"), mbbSecret, mbbPacketHandler);
                 _rsauth.AddPacketHandler(IPAddress.Parse("10.50.0.254"), mbbSecret, mbbPacketHandler);

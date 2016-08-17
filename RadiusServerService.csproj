@@ -114,6 +114,10 @@
       <Project>{7f13e2f1-79e3-45c1-857c-e6d3cd793b22}</Project>
       <Name>Flexinets.DBEF</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\WebSites\FlexinetsPortal\SMSGateway\SMSGateway\Flexinets.Communication.csproj">
+      <Project>{9ebbd070-384e-4ea1-acce-37181c312183}</Project>
+      <Name>Flexinets.Communication</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Flexinets.Radius.PacketHandlers\Flexinets.Radius.PacketHandlers.csproj">
       <Project>{d4f47772-c91f-4646-ad37-669b23033f55}</Project>
       <Name>Flexinets.Radius.PacketHandlers</Name>

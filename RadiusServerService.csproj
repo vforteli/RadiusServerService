@@ -107,6 +107,7 @@
     <None Include="App.Release.config">
       <DependentUpon>App.config</DependentUpon>
     </None>
+    <None Include="install.ps1" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

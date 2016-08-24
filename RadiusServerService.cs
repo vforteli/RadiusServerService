@@ -41,7 +41,7 @@ namespace Flexinets.Radius
                 var port = Convert.ToInt32(CloudConfigurationManager.GetSetting("Port"));
                 var ipassSecret = CloudConfigurationManager.GetSetting("ipasssecret");
                 var mbbSecret = CloudConfigurationManager.GetSetting("mbbsecret");
-                var disconnectCheckerPath = CloudConfigurationManager.GetSetting("DisconnectCheckerPath");
+                var disconnectSecret = CloudConfigurationManager.GetSetting("disconnectSecret");
                 var apiUrl = CloudConfigurationManager.GetSetting("ApiUrl");
                 _log.Info("Configuration read");
 
@@ -61,7 +61,8 @@ namespace Flexinets.Radius
 
                 var networkIdProvider = new NetworkIdProvider(_contextFactory, apiUrl);
                 var welcomeSender = new WelcomeSender(_contextFactory, smsgateway);
-                var mbbPacketHandler = new MobileDataPacketHandler(_contextFactory, networkIdProvider, welcomeSender, disconnectCheckerPath);
+                var disconnector = new RadiusDisconnector(_contextFactory, disconnectSecret);
+                var mbbPacketHandler = new MobileDataPacketHandler(_contextFactory, networkIdProvider, welcomeSender, disconnector);
 
                 _rsauth.AddPacketHandler(IPAddress.Parse("10.50.0.253"), mbbSecret, mbbPacketHandler);
                 _rsauth.AddPacketHandler(IPAddress.Parse("10.50.0.254"), mbbSecret, mbbPacketHandler);

@@ -3,16 +3,9 @@ using FlexinetsDBEF;
 using log4net;
 using Microsoft.Azure;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.ServiceProcess;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Flexinets.Radius
 {
@@ -36,7 +29,7 @@ namespace Flexinets.Radius
             {
                 _log.Info("Reading configuration");
                 _contextFactory = new FlexinetsEntitiesFactory(CloudConfigurationManager.GetSetting("SQLConnectionString"));
-                var path = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\dictionary";  // todo hurgh
+                var path = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + "\\dictionary";
                 var dictionary = new RadiusDictionary(path);
                 var port = Convert.ToInt32(CloudConfigurationManager.GetSetting("Port"));
                 var ipassSecret = CloudConfigurationManager.GetSetting("ipasssecret");

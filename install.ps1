@@ -11,6 +11,9 @@ if ($service) {
 	$foo.WaitForStatus("Stopped", '00:00:30')
 	sleep 2;	# wait for gc?
 }
+else {
+	echo "Service does not exist";
+}
 
 if(!(Test-Path -Path $installdir )){
 	mkdir $installdir;
@@ -24,6 +27,12 @@ else {
 echo "Copying files to $installdir";
 Copy-Item * $installdir;
 
+
+if (!$service) {
+	echo "Creating service $servicename";
+    $arguments = "`"$installdir/radiusserverservice.exe`"";
+    Start-Process –FilePath C:\Windows\Microsoft.NET\Framework\v4.0.30319\installutil.exe –ArgumentList $arguments –NoNewWindow -Wait
+}
+
 echo "Starting service $servicename";
 Start-Service $servicename;
-

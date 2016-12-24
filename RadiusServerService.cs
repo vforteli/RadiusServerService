@@ -1,4 +1,5 @@
 ﻿using Flexinets.MobileData.SMS;
+using Flexinets.Radius.PacketHandlers;
 using FlexinetsDBEF;
 using log4net;
 using Microsoft.Azure;
@@ -36,13 +37,17 @@ namespace Flexinets.Radius
                 var mbbSecret = CloudConfigurationManager.GetSetting("mbbsecret");
                 var disconnectSecret = CloudConfigurationManager.GetSetting("disconnectSecret");
                 var apiUrl = CloudConfigurationManager.GetSetting("ApiUrl");
+                var checkPathOld = CloudConfigurationManager.GetSetting("ipass.checkpathold");
+                var checkPathNew = CloudConfigurationManager.GetSetting("ipass.checkpathnew");
                 _log.Info("Configuration read");
+
+                var authProxy = new iPassAuthenticationProxy(_contextFactory, checkPathOld, checkPathNew);                
 
 
                 _rsauth = new RadiusServer(new IPEndPoint(IPAddress.Any, port), dictionary);
                 _rsacct = new RadiusServer(new IPEndPoint(IPAddress.Any, port + 1), dictionary);    // todo, good grief...
 
-                var ipassPacketHandler = new iPassPacketHandler(_contextFactory);
+                var ipassPacketHandler = new iPassPacketHandler(_contextFactory, authProxy);
                 _rsauth.AddPacketHandler(IPAddress.Parse("127.0.0.1"), ipassSecret, ipassPacketHandler);
                 _rsacct.AddPacketHandler(IPAddress.Parse("127.0.0.1"), ipassSecret, ipassPacketHandler);
 

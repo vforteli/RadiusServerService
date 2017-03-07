@@ -41,7 +41,7 @@ namespace Flexinets.Radius
                 var checkPathNew = CloudConfigurationManager.GetSetting("ipass.checkpathnew");
                 _log.Info("Configuration read");
 
-                var authProxy = new iPassAuthenticationProxy(_contextFactory, checkPathOld, checkPathNew);                
+                var authProxy = new iPassAuthenticationProxy(_contextFactory, checkPathOld, checkPathNew);
 
 
                 _rsauth = new RadiusServer(new IPEndPoint(IPAddress.Any, port), dictionary);
@@ -56,8 +56,9 @@ namespace Flexinets.Radius
                     CloudConfigurationManager.GetSetting("twilio.accountsid"),
                     CloudConfigurationManager.GetSetting("twilio.authtoken"));
 
-
-                var networkIdProvider = new NetworkIdProvider(_contextFactory, apiUrl);
+                var networkProvider = new NetworkProvider(_contextFactory);
+                var networkApiClient = new NetworkApiClient(_contextFactory, new WebClientFactory(), networkProvider, apiUrl);
+                var networkIdProvider = new NetworkIdProvider(new DateTimeProvider(), networkApiClient);
                 var welcomeSender = new WelcomeSender(_contextFactory, smsgateway);
                 var disconnector = new RadiusDisconnector(_contextFactory, disconnectSecret);
                 var mbbPacketHandler = new MobileDataPacketHandler(_contextFactory, networkIdProvider, welcomeSender, disconnector);

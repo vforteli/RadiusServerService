@@ -34,5 +34,7 @@ if (!$service) {
     Start-Process –FilePath C:\Windows\Microsoft.NET\Framework\v4.0.30319\installutil.exe –ArgumentList $arguments –NoNewWindow -Wait
 }
 
+
 echo "Starting service $servicename";
 Start-Service $servicename;
+	

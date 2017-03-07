@@ -212,7 +212,9 @@
     <None Include="App.Release.config">
       <DependentUpon>App.config</DependentUpon>
     </None>
-    <None Include="install.ps1" />
+    <None Include="install.ps1">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="packages.config" />
     <None Include="RadiusServerService_TemporaryKey.pfx" />
   </ItemGroup>

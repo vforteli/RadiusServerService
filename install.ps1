@@ -25,7 +25,7 @@ else {
 }
  
 echo "Copying files to $installdir";
-Copy-Item * $installdir;
+Copy-Item $PSScriptRoot\* $installdir;
 
 
 if (!$service) {

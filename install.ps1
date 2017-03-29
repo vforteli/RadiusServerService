@@ -1,7 +1,8 @@
 $servicename = "radiusserverservice";
 $installdir = ${env:ProgramFiles} + "\Flexinets\radiusserverservice";
+$version = (Get-Item $PSScriptRoot\$servicename.exe).VersionInfo.FileVersion
 
-
+echo "Installing $servicename version $version";
 $service = Get-WmiObject -Class Win32_Service -Filter "Name='$servicename'";
 
 if ($service) {

@@ -69,6 +69,16 @@ namespace Flexinets.Radius
                 _rsacct.AddPacketHandler(IPAddress.Parse("10.50.0.253"), mbbSecret, mbbPacketHandler);
                 _rsacct.AddPacketHandler(IPAddress.Parse("10.50.0.254"), mbbSecret, mbbPacketHandler);
 
+                // todo refactor this
+                _rsauth.AddPacketHandler(IPAddress.Parse("10.239.24.6"), mbbSecret, mbbPacketHandler);
+                _rsauth.AddPacketHandler(IPAddress.Parse("10.239.24.7"), mbbSecret, mbbPacketHandler);
+                _rsauth.AddPacketHandler(IPAddress.Parse("10.239.24.8"), mbbSecret, mbbPacketHandler);
+
+                _rsacct.AddPacketHandler(IPAddress.Parse("10.239.24.6"), mbbSecret, mbbPacketHandler);
+                _rsacct.AddPacketHandler(IPAddress.Parse("10.239.24.7"), mbbSecret, mbbPacketHandler);
+                _rsacct.AddPacketHandler(IPAddress.Parse("10.239.24.8"), mbbSecret, mbbPacketHandler);
+
+
                 _rsauth.Start();
                 _rsacct.Start();
             }

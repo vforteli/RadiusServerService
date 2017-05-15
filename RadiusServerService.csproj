@@ -225,7 +225,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="packages.config" />
-    <None Include="RadiusServerService_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\WebSites\FlexinetsPortal\FlexinetsDBEF\Flexinets.DBEF.csproj">

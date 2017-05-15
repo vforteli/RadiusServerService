@@ -63,6 +63,7 @@ namespace Flexinets.Radius
                 var welcomeSender = new WelcomeSender(_contextFactory, smsgateway);
                 var disconnector = new RadiusDisconnector(_contextFactory, disconnectSecret);
                 var mbbPacketHandler = new MobileDataPacketHandler(_contextFactory, networkIdProvider, welcomeSender, disconnector);
+                var mbbPacketHandlerV2 = new MobileDataPacketHandlerV2(_contextFactory, welcomeSender, disconnector);
 
                 _rsauth.AddPacketHandler(IPAddress.Parse("10.50.0.253"), mbbSecret, mbbPacketHandler);
                 _rsauth.AddPacketHandler(IPAddress.Parse("10.50.0.254"), mbbSecret, mbbPacketHandler);
@@ -71,13 +72,13 @@ namespace Flexinets.Radius
                 _rsacct.AddPacketHandler(IPAddress.Parse("10.50.0.254"), mbbSecret, mbbPacketHandler);
 
                 // todo refactor this
-                _rsauth.AddPacketHandler(IPAddress.Parse("10.239.24.6"), mbbNewSecret, mbbPacketHandler);
-                _rsauth.AddPacketHandler(IPAddress.Parse("10.239.24.7"), mbbNewSecret, mbbPacketHandler);
-                _rsauth.AddPacketHandler(IPAddress.Parse("10.239.24.8"), mbbNewSecret, mbbPacketHandler);
+                _rsauth.AddPacketHandler(IPAddress.Parse("10.239.24.6"), mbbNewSecret, mbbPacketHandlerV2);
+                _rsauth.AddPacketHandler(IPAddress.Parse("10.239.24.7"), mbbNewSecret, mbbPacketHandlerV2);
+                _rsauth.AddPacketHandler(IPAddress.Parse("10.239.24.8"), mbbNewSecret, mbbPacketHandlerV2);
 
-                _rsacct.AddPacketHandler(IPAddress.Parse("10.239.24.6"), mbbNewSecret, mbbPacketHandler);
-                _rsacct.AddPacketHandler(IPAddress.Parse("10.239.24.7"), mbbNewSecret, mbbPacketHandler);
-                _rsacct.AddPacketHandler(IPAddress.Parse("10.239.24.8"), mbbNewSecret, mbbPacketHandler);
+                _rsacct.AddPacketHandler(IPAddress.Parse("10.239.24.6"), mbbNewSecret, mbbPacketHandlerV2);
+                _rsacct.AddPacketHandler(IPAddress.Parse("10.239.24.7"), mbbNewSecret, mbbPacketHandlerV2);
+                _rsacct.AddPacketHandler(IPAddress.Parse("10.239.24.8"), mbbNewSecret, mbbPacketHandlerV2);
 
 
                 _rsauth.Start();

@@ -72,20 +72,8 @@
     <SignManifests>true</SignManifests>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
-      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
-      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="log4net, Version=2.0.8.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
       <HintPath>..\packages\log4net.2.0.8\lib\net45-full\log4net.dll</HintPath>
-    </Reference>
-    <Reference Include="Log4Slack, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Log4Slack\Log4Slack\bin\Release\Log4Slack.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.WindowsAzure.Configuration, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.WindowsAzure.ConfigurationManager.3.2.3\lib\net40\Microsoft.WindowsAzure.Configuration.dll</HintPath>
@@ -209,17 +197,10 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ThrottlingAppenderFilter.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">
       <SubType>Designer</SubType>
-    </None>
-    <None Include="App.Debug.config">
-      <DependentUpon>App.config</DependentUpon>
-    </None>
-    <None Include="App.Release.config">
-      <DependentUpon>App.config</DependentUpon>
     </None>
     <None Include="install.ps1">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -228,18 +209,6 @@
     <None Include="RadiusServerService_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\WebSites\FlexinetsPortal\FlexinetsDBEF\Flexinets.DBEF.csproj">
-      <Project>{7f13e2f1-79e3-45c1-857c-e6d3cd793b22}</Project>
-      <Name>Flexinets.DBEF</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\WebSites\FlexinetsPortal\SMSGateway\SMSGateway\Flexinets.Communication.csproj">
-      <Project>{9ebbd070-384e-4ea1-acce-37181c312183}</Project>
-      <Name>Flexinets.Communication</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Flexinets.Radius.PacketHandlers\Flexinets.Radius.PacketHandlers.csproj">
-      <Project>{d4f47772-c91f-4646-ad37-669b23033f55}</Project>
-      <Name>Flexinets.Radius.PacketHandlers</Name>
-    </ProjectReference>
     <ProjectReference Include="..\RadiusServer\RadiusServer.csproj">
       <Project>{968c479e-00e7-4d7b-b2f7-f3c26587f7f0}</Project>
       <Name>RadiusServer</Name>

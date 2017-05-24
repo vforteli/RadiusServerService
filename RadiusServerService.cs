@@ -4,8 +4,10 @@ using FlexinetsDBEF;
 using log4net;
 using Microsoft.Azure;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Net;
+using System.Reflection;
 using System.ServiceProcess;
 
 namespace Flexinets.Radius
@@ -28,6 +30,7 @@ namespace Flexinets.Radius
             log4net.Config.XmlConfigurator.Configure();
             try
             {
+                _log.Info($"Starting RadiusServerService build version {FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion}");
                 _log.Info("Reading configuration");
                 _contextFactory = new FlexinetsEntitiesFactory(CloudConfigurationManager.GetSetting("SQLConnectionString"));
                 var path = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + "\\dictionary";

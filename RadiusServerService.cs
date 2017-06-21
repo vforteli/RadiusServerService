@@ -48,8 +48,8 @@ namespace Flexinets.Radius
                 var authProxy = new iPassAuthenticationProxy(_contextFactory, checkPathOld, checkPathNew);
 
 
-                _rsauth = new RadiusServer(new IPEndPoint(IPAddress.Any, port), dictionary);
-                _rsacct = new RadiusServer(new IPEndPoint(IPAddress.Any, port + 1), dictionary);    // todo, good grief...
+                _rsauth = new RadiusServer(new IPEndPoint(IPAddress.Any, port), dictionary, RadiusServerType.Authentication);
+                _rsacct = new RadiusServer(new IPEndPoint(IPAddress.Any, port + 1), dictionary, RadiusServerType.Accounting);    // todo, good grief...
 
                 var ipassPacketHandler = new iPassPacketHandler(_contextFactory, authProxy);
                 _rsauth.AddPacketHandler(IPAddress.Parse("127.0.0.1"), ipassSecret, ipassPacketHandler);
@@ -65,8 +65,9 @@ namespace Flexinets.Radius
                 var networkIdProvider = new NetworkIdProvider(new DateTimeProvider(), networkApiClient);
                 var welcomeSender = new WelcomeSender(_contextFactory, smsgateway);
                 var disconnector = new RadiusDisconnector(_contextFactory, disconnectSecret);
+                var disconnectorV2 = new RadiusDisconnectorV2(_contextFactory, "changeme", "changeme", "changeme");
                 var mbbPacketHandler = new MobileDataPacketHandler(_contextFactory, networkIdProvider, welcomeSender, disconnector);
-                var mbbPacketHandlerV2 = new MobileDataPacketHandlerV2(_contextFactory, welcomeSender, disconnector);
+                var mbbPacketHandlerV2 = new MobileDataPacketHandlerV2(_contextFactory, welcomeSender, disconnectorV2);
 
                 _rsauth.AddPacketHandler(IPAddress.Parse("10.50.0.253"), mbbSecret, mbbPacketHandler);
                 _rsauth.AddPacketHandler(IPAddress.Parse("10.50.0.254"), mbbSecret, mbbPacketHandler);

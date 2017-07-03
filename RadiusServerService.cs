@@ -65,7 +65,11 @@ namespace Flexinets.Radius
                 var networkIdProvider = new NetworkIdProvider(new DateTimeProvider(), networkApiClient);
                 var welcomeSender = new WelcomeSender(_contextFactory, smsgateway);
                 var disconnector = new RadiusDisconnector(_contextFactory, disconnectSecret);
-                var disconnectorV2 = new RadiusDisconnectorV2(_contextFactory, "changeme", "changeme", "changeme");
+
+                var disconnectorV2 = new RadiusDisconnectorV2(_contextFactory,
+                    CloudConfigurationManager.GetSetting("disconnector.username"),
+                    CloudConfigurationManager.GetSetting("disconnector.password"),
+                    CloudConfigurationManager.GetSetting("disconnector.apiurl"));
                 var mbbPacketHandler = new MobileDataPacketHandler(_contextFactory, networkIdProvider, welcomeSender, disconnector);
                 var mbbPacketHandlerV2 = new MobileDataPacketHandlerV2(_contextFactory, welcomeSender, disconnectorV2);
 

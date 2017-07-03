@@ -60,24 +60,12 @@ namespace Flexinets.Radius
                     CloudConfigurationManager.GetSetting("twilio.accountsid"),
                     CloudConfigurationManager.GetSetting("twilio.authtoken"));
 
-                var networkProvider = new NetworkProvider(_contextFactory);
-                var networkApiClient = new NetworkApiClient(_contextFactory, new WebClientFactory(), networkProvider, apiUrl);
-                var networkIdProvider = new NetworkIdProvider(new DateTimeProvider(), networkApiClient);
                 var welcomeSender = new WelcomeSender(_contextFactory, smsgateway);
-                var disconnector = new RadiusDisconnector(_contextFactory, disconnectSecret);
-
                 var disconnectorV2 = new RadiusDisconnectorV2(_contextFactory,
                     CloudConfigurationManager.GetSetting("disconnector.username"),
                     CloudConfigurationManager.GetSetting("disconnector.password"),
                     CloudConfigurationManager.GetSetting("disconnector.apiurl"));
-                var mbbPacketHandler = new MobileDataPacketHandler(_contextFactory, networkIdProvider, welcomeSender, disconnector);
                 var mbbPacketHandlerV2 = new MobileDataPacketHandlerV2(_contextFactory, welcomeSender, disconnectorV2);
-
-                _rsauth.AddPacketHandler(IPAddress.Parse("10.50.0.253"), mbbSecret, mbbPacketHandler);
-                _rsauth.AddPacketHandler(IPAddress.Parse("10.50.0.254"), mbbSecret, mbbPacketHandler);
-
-                _rsacct.AddPacketHandler(IPAddress.Parse("10.50.0.253"), mbbSecret, mbbPacketHandler);
-                _rsacct.AddPacketHandler(IPAddress.Parse("10.50.0.254"), mbbSecret, mbbPacketHandler);
 
                 // todo refactor this
                 _rsauth.AddPacketHandler(IPAddress.Parse("10.239.24.6"), mbbNewSecret, mbbPacketHandlerV2);

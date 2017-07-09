@@ -208,6 +208,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\WebSites\FlexinetsPortal\FlexinetsAccessControl\Flexinets.Security.csproj">
+      <Project>{5A4E29EB-6D2F-4727-918E-9BD009579F79}</Project>
+      <Name>Flexinets.Security</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\WebSites\FlexinetsPortal\FlexinetsDBEF\Flexinets.DBEF.csproj">
       <Project>{7f13e2f1-79e3-45c1-857c-e6d3cd793b22}</Project>
       <Name>Flexinets.DBEF</Name>

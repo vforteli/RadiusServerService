@@ -1,5 +1,6 @@
 ﻿using Flexinets.MobileData.SMS;
 using Flexinets.Radius.PacketHandlers;
+using Flexinets.Security;
 using FlexinetsDBEF;
 using log4net;
 using Microsoft.Azure;
@@ -51,7 +52,7 @@ namespace Flexinets.Radius
                 _rsauth = new RadiusServer(new IPEndPoint(IPAddress.Any, port), dictionary, RadiusServerType.Authentication);
                 _rsacct = new RadiusServer(new IPEndPoint(IPAddress.Any, port + 1), dictionary, RadiusServerType.Accounting);    // todo, good grief...
 
-                var ipassPacketHandler = new iPassPacketHandler(_contextFactory, authProxy);
+                var ipassPacketHandler = new iPassPacketHandler(_contextFactory, authProxy, new UserAuthenticationProvider(null, _contextFactory, null));
                 _rsauth.AddPacketHandler(IPAddress.Parse("127.0.0.1"), ipassSecret, ipassPacketHandler);
                 _rsacct.AddPacketHandler(IPAddress.Parse("127.0.0.1"), ipassSecret, ipassPacketHandler);
 

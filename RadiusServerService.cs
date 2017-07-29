@@ -1,5 +1,4 @@
 ﻿using log4net;
-using Microsoft.Azure;
 using System;
 using System.IO;
 using System.Net;
@@ -27,12 +26,10 @@ namespace Flexinets.Radius
                 _log.Info("Reading configuration");
                 var path = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + "\\dictionary";
                 var dictionary = new RadiusDictionary(path);
-                var port = Convert.ToInt32(CloudConfigurationManager.GetSetting("Port"));                
                 _log.Info("Configuration read");
 
-
-                _rsauth = new RadiusServer(new IPEndPoint(IPAddress.Any, port), dictionary);
-                _rsacct = new RadiusServer(new IPEndPoint(IPAddress.Any, port + 1), dictionary);
+                _rsauth = new RadiusServer(new IPEndPoint(IPAddress.Any, 1812), dictionary, RadiusServerType.Authentication);
+                _rsacct = new RadiusServer(new IPEndPoint(IPAddress.Any, 1813), dictionary, RadiusServerType.Accounting);
 
                 var packetHandler = new MockPacketHandler();
                 _rsauth.AddPacketHandler(IPAddress.Parse("127.0.0.1"), "secret", packetHandler);
@@ -50,10 +47,10 @@ namespace Flexinets.Radius
 
         protected override void OnStop()
         {
-            _rsauth.Stop();
-            _rsauth.Dispose();
-            _rsacct.Stop();
-            _rsacct.Dispose();
+            _rsauth?.Stop();
+            _rsauth?.Dispose();
+            _rsacct?.Stop();
+            _rsacct?.Dispose();
         }
     }
 }

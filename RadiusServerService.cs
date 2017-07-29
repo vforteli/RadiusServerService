@@ -1,4 +1,5 @@
 ﻿using Flexinets.MobileData.SMS;
+using Flexinets.Radius.Disconnector;
 using Flexinets.Radius.PacketHandlers;
 using Flexinets.Security;
 using FlexinetsDBEF;
@@ -62,7 +63,7 @@ namespace Flexinets.Radius
                     CloudConfigurationManager.GetSetting("twilio.authtoken"));
 
                 var welcomeSender = new WelcomeSender(_contextFactory, smsgateway);
-                var disconnectorV2 = new RadiusDisconnectorV2(_contextFactory,
+                var disconnectorV2 = new RadiusDisconnectorV2(
                     CloudConfigurationManager.GetSetting("disconnector.username"),
                     CloudConfigurationManager.GetSetting("disconnector.password"),
                     CloudConfigurationManager.GetSetting("disconnector.apiurl"));

@@ -33,6 +33,8 @@
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
     <BootstrapperEnabled>true</BootstrapperEnabled>
+    <ShouldCreateLogs>True</ShouldCreateLogs>
+    <AdvancedSettingsExpanded>True</AdvancedSettingsExpanded>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -198,6 +200,7 @@
     </None>
     <None Include="App.Debug.config">
       <DependentUpon>App.config</DependentUpon>
+      <SubType>Designer</SubType>
     </None>
     <None Include="App.Release.config">
       <DependentUpon>App.config</DependentUpon>
@@ -219,6 +222,10 @@
     <ProjectReference Include="..\..\..\WebSites\FlexinetsPortal\SMSGateway\SMSGateway\Flexinets.Communication.csproj">
       <Project>{9ebbd070-384e-4ea1-acce-37181c312183}</Project>
       <Name>Flexinets.Communication</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Flexinets.Radius.Disconnector\Flexinets.Radius.Disconnector.csproj">
+      <Project>{AFC252BD-BE9F-4AB4-9C85-806071CA8BE9}</Project>
+      <Name>Flexinets.Radius.Disconnector</Name>
     </ProjectReference>
     <ProjectReference Include="..\Flexinets.Radius.PacketHandlers\Flexinets.Radius.PacketHandlers.csproj">
       <Project>{d4f47772-c91f-4646-ad37-669b23033f55}</Project>

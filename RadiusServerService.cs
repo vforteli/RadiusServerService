@@ -91,10 +91,10 @@ namespace Flexinets.Radius
 
         protected override void OnStop()
         {
-            _rsauth.Stop();
-            _rsauth.Dispose();
-            _rsacct.Stop();
-            _rsacct.Dispose();
+            _rsauth?.Stop();
+            _rsauth?.Dispose();
+            _rsacct?.Stop();
+            _rsacct?.Dispose();
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Flexinets.MobileData.SMS;
+using Flexinets.Radius.Core;
 using Flexinets.Radius.Disconnector;
 using Flexinets.Radius.PacketHandlers;
 using Flexinets.Security;
@@ -35,7 +36,7 @@ namespace Flexinets.Radius
                 _log.Info($"Starting RadiusServerService build version {FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion}");
                 _log.Info("Reading configuration");
                 _contextFactory = new FlexinetsEntitiesFactory(CloudConfigurationManager.GetSetting("SQLConnectionString"));
-                var path = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + "\\dictionary";
+                var path = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + "\\radius.dictionary";
                 var dictionary = new RadiusDictionary(path);
                 var port = Convert.ToInt32(CloudConfigurationManager.GetSetting("Port"));
                 var ipassSecret = CloudConfigurationManager.GetSetting("ipasssecret");

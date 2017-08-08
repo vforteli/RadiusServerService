@@ -7,6 +7,7 @@ using FlexinetsDBEF;
 using log4net;
 using Microsoft.Azure;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
@@ -18,8 +19,8 @@ namespace Flexinets.Radius
     public partial class RadiusServerService : ServiceBase
     {
         private FlexinetsEntitiesFactory _contextFactory;
-        private RadiusServer _rsauth;
-        private RadiusServer _rsacct;
+        private RadiusServer _authenticationServer;
+        private RadiusServer _accountingServer;
         private readonly ILog _log = LogManager.GetLogger(typeof(RadiusServerService));
 
 
@@ -51,12 +52,12 @@ namespace Flexinets.Radius
                 var authProxy = new iPassAuthenticationProxy(_contextFactory, checkPathOld, checkPathNew);
 
 
-                _rsauth = new RadiusServer(new IPEndPoint(IPAddress.Any, port), dictionary, RadiusServerType.Authentication);
-                _rsacct = new RadiusServer(new IPEndPoint(IPAddress.Any, port + 1), dictionary, RadiusServerType.Accounting);    // todo, good grief...
+                _authenticationServer = new RadiusServer(new IPEndPoint(IPAddress.Any, port), dictionary, RadiusServerType.Authentication);
+                _accountingServer = new RadiusServer(new IPEndPoint(IPAddress.Any, port + 1), dictionary, RadiusServerType.Accounting);    // todo, good grief...
 
                 var ipassPacketHandler = new iPassPacketHandler(_contextFactory, authProxy, new UserAuthenticationProvider(null, _contextFactory, null));
-                _rsauth.AddPacketHandler(IPAddress.Parse("127.0.0.1"), ipassSecret, ipassPacketHandler);
-                _rsacct.AddPacketHandler(IPAddress.Parse("127.0.0.1"), ipassSecret, ipassPacketHandler);
+                _authenticationServer.AddPacketHandler(IPAddress.Parse("127.0.0.1"), ipassSecret, ipassPacketHandler);
+                _accountingServer.AddPacketHandler(IPAddress.Parse("127.0.0.1"), ipassSecret, ipassPacketHandler);
 
                 var smsgateway = new SMSGatewayTwilio(
                     CloudConfigurationManager.GetSetting("twilio.deliveryreporturl"),
@@ -71,17 +72,16 @@ namespace Flexinets.Radius
                 var mbbPacketHandlerV2 = new MobileDataPacketHandlerV2(_contextFactory, welcomeSender, disconnectorV2);
 
                 // todo refactor this
-                _rsauth.AddPacketHandler(IPAddress.Parse("10.239.24.6"), mbbNewSecret, mbbPacketHandlerV2);
-                _rsauth.AddPacketHandler(IPAddress.Parse("10.239.24.7"), mbbNewSecret, mbbPacketHandlerV2);
-                _rsauth.AddPacketHandler(IPAddress.Parse("10.239.24.8"), mbbNewSecret, mbbPacketHandlerV2);
+                var remoteAddresses = new List<IPAddress> {
+                    IPAddress.Parse("10.239.24.6"),
+                    IPAddress.Parse("10.239.24.7"),
+                    IPAddress.Parse("10.239.24.8") };
 
-                _rsacct.AddPacketHandler(IPAddress.Parse("10.239.24.6"), mbbNewSecret, mbbPacketHandlerV2);
-                _rsacct.AddPacketHandler(IPAddress.Parse("10.239.24.7"), mbbNewSecret, mbbPacketHandlerV2);
-                _rsacct.AddPacketHandler(IPAddress.Parse("10.239.24.8"), mbbNewSecret, mbbPacketHandlerV2);
+                _authenticationServer.AddPacketHandler(remoteAddresses, mbbNewSecret, mbbPacketHandlerV2);
+                _accountingServer.AddPacketHandler(remoteAddresses, mbbNewSecret, mbbPacketHandlerV2);
 
-
-                _rsauth.Start();
-                _rsacct.Start();
+                _authenticationServer.Start();
+                _accountingServer.Start();
             }
             catch (Exception ex)
             {
@@ -92,10 +92,10 @@ namespace Flexinets.Radius
 
         protected override void OnStop()
         {
-            _rsauth?.Stop();
-            _rsauth?.Dispose();
-            _rsacct?.Stop();
-            _rsacct?.Dispose();
+            _authenticationServer?.Stop();
+            _authenticationServer?.Dispose();
+            _accountingServer?.Stop();
+            _accountingServer?.Dispose();
         }
     }
 }

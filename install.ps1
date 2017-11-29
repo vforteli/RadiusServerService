@@ -22,11 +22,11 @@ if(!(Test-Path -Path $installdir )){
 }
 else {
 	echo "Install directory exists, removing old version";
-	Remove-Item $installdir\*
+	Remove-Item $installdir\* -recurse
 }
  
 echo "Copying files to $installdir";
-Copy-Item $PSScriptRoot\* $installdir;
+Copy-Item $PSScriptRoot\* $installdir -recurse;
 
 
 if (!$service) {

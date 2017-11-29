@@ -1,4 +1,4 @@
-﻿using Flexinets.MobileData.SMS;
+﻿using Flexinets.Core.Communication.Sms;
 using Flexinets.Radius.Core;
 using Flexinets.Radius.Disconnector;
 using Flexinets.Radius.PacketHandlers;
@@ -36,26 +36,21 @@ namespace Flexinets.Radius
             {
                 _log.Info($"Starting RadiusServerService build version {FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion}");
                 _log.Info("Reading configuration");
+
                 _contextFactory = new FlexinetsEntitiesFactory(CloudConfigurationManager.GetSetting("SQLConnectionString"));
-                var path = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + "\\radius.dictionary";
-                var dictionary = new RadiusDictionary(path);
+
+                var dictionary = new RadiusDictionary(Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + "\\radius.dictionary");
                 var port = Convert.ToInt32(CloudConfigurationManager.GetSetting("Port"));
-                var ipassSecret = CloudConfigurationManager.GetSetting("ipasssecret");
-                var mbbSecret = CloudConfigurationManager.GetSetting("mbbsecret");
-                var mbbNewSecret = CloudConfigurationManager.GetSetting("mbbnewsecret");
-                var disconnectSecret = CloudConfigurationManager.GetSetting("disconnectSecret");
-                var apiUrl = CloudConfigurationManager.GetSetting("ApiUrl");
-                var checkPathOld = CloudConfigurationManager.GetSetting("ipass.checkpathold");
-                var checkPathNew = CloudConfigurationManager.GetSetting("ipass.checkpathnew");
-                _log.Info("Configuration read");
-
-                var authProxy = new iPassAuthenticationProxy(_contextFactory, checkPathOld, checkPathNew);
-
-
                 _authenticationServer = new RadiusServer(new IPEndPoint(IPAddress.Any, port), dictionary, RadiusServerType.Authentication);
                 _accountingServer = new RadiusServer(new IPEndPoint(IPAddress.Any, port + 1), dictionary, RadiusServerType.Accounting);    // todo, good grief...
 
+                var authProxy = new iPassAuthenticationProxy(
+                    _contextFactory,
+                    CloudConfigurationManager.GetSetting("ipass.checkpathold"),
+                    CloudConfigurationManager.GetSetting("ipass.checkpathnew"));
+
                 var ipassPacketHandler = new iPassPacketHandler(_contextFactory, authProxy, new UserAuthenticationProvider(null, _contextFactory, null));
+                var ipassSecret = CloudConfigurationManager.GetSetting("ipasssecret");
                 _authenticationServer.AddPacketHandler(IPAddress.Parse("127.0.0.1"), ipassSecret, ipassPacketHandler);
                 _accountingServer.AddPacketHandler(IPAddress.Parse("127.0.0.1"), ipassSecret, ipassPacketHandler);
 
@@ -77,8 +72,11 @@ namespace Flexinets.Radius
                     IPAddress.Parse("10.239.24.7"),
                     IPAddress.Parse("10.239.24.8") };
 
+                var mbbNewSecret = CloudConfigurationManager.GetSetting("mbbnewsecret");
                 _authenticationServer.AddPacketHandler(remoteAddresses, mbbNewSecret, mbbPacketHandlerV2);
                 _accountingServer.AddPacketHandler(remoteAddresses, mbbNewSecret, mbbPacketHandlerV2);
+
+                _log.Info("Configuration read");
 
                 _authenticationServer.Start();
                 _accountingServer.Start();

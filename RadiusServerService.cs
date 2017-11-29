@@ -70,7 +70,12 @@ namespace Flexinets.Radius
                 var remoteAddresses = new List<IPAddress> {
                     IPAddress.Parse("10.239.24.6"),
                     IPAddress.Parse("10.239.24.7"),
-                    IPAddress.Parse("10.239.24.8") };
+                    IPAddress.Parse("10.239.24.8"),
+                    IPAddress.Parse("10.239.24.15"),
+                    IPAddress.Parse("10.239.24.16"),
+                    IPAddress.Parse("10.239.24.17")
+                };
+
 
                 var mbbNewSecret = CloudConfigurationManager.GetSetting("mbbnewsecret");
                 _authenticationServer.AddPacketHandler(remoteAddresses, mbbNewSecret, mbbPacketHandlerV2);

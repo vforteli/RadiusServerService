@@ -1,13 +1,9 @@
-﻿using Flexinets.Core.Communication.Sms;
-using Flexinets.Radius.Core;
-using Flexinets.Radius.Disconnector;
-using Flexinets.Radius.PacketHandlers;
-using Flexinets.Security;
-using FlexinetsDBEF;
-using log4net;
-using Microsoft.Azure;
+﻿using Flexinets.Radius.Core;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+using NLog;
+using NLog.Extensions.Logging;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
@@ -18,10 +14,7 @@ namespace Flexinets.Radius
 {
     public partial class RadiusServerService : ServiceBase
     {
-        private FlexinetsEntitiesFactory _contextFactory;
         private RadiusServer _authenticationServer;
-        private RadiusServer _accountingServer;
-        private readonly ILog _log = LogManager.GetLogger(typeof(RadiusServerService));
 
 
         public RadiusServerService()
@@ -31,64 +24,40 @@ namespace Flexinets.Radius
 
         protected override void OnStart(string[] args)
         {
-            log4net.Config.XmlConfigurator.Configure();
             try
             {
-                _log.Info($"Starting RadiusServerService build version {FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion}");
-                _log.Info("Reading configuration");
+                //   _log.Info($"Starting RadiusServerService build version {FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion}");
+                //   _log.Info("Reading configuration");
 
-                _contextFactory = new FlexinetsEntitiesFactory(CloudConfigurationManager.GetSetting("SQLConnectionString"));
-
-                var dictionary = new RadiusDictionary(Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + "\\content\\radius.dictionary");
-                var port = Convert.ToInt32(CloudConfigurationManager.GetSetting("Port"));
-                _authenticationServer = new RadiusServer(new IPEndPoint(IPAddress.Any, port), dictionary, RadiusServerType.Authentication);
-                _accountingServer = new RadiusServer(new IPEndPoint(IPAddress.Any, port + 1), dictionary, RadiusServerType.Accounting);    // todo, good grief...
-
-                var authProxy = new iPassAuthenticationProxy(
-                    _contextFactory,
-                    CloudConfigurationManager.GetSetting("ipass.checkpathold"),
-                    CloudConfigurationManager.GetSetting("ipass.checkpathnew"));
-
-                var ipassPacketHandler = new iPassPacketHandler(_contextFactory, authProxy, new UserAuthenticationProvider(null, _contextFactory, null));
-                var ipassSecret = CloudConfigurationManager.GetSetting("ipasssecret");
-                _authenticationServer.AddPacketHandler(IPAddress.Parse("127.0.0.1"), ipassSecret, ipassPacketHandler);
-                _accountingServer.AddPacketHandler(IPAddress.Parse("127.0.0.1"), ipassSecret, ipassPacketHandler);
-
-                var smsgateway = new SMSGatewayTwilio(
-                    CloudConfigurationManager.GetSetting("twilio.deliveryreporturl"),
-                    CloudConfigurationManager.GetSetting("twilio.accountsid"),
-                    CloudConfigurationManager.GetSetting("twilio.authtoken"));
-
-                var welcomeSender = new WelcomeSender(_contextFactory, smsgateway);
-                var disconnectorV2 = new RadiusDisconnectorV2(
-                    CloudConfigurationManager.GetSetting("disconnector.username"),
-                    CloudConfigurationManager.GetSetting("disconnector.password"),
-                    CloudConfigurationManager.GetSetting("disconnector.apiurl"));
-                var mbbPacketHandlerV2 = new MobileDataPacketHandlerV2(_contextFactory, welcomeSender, disconnectorV2);
-
-                // todo refactor this
-                var remoteAddresses = new List<IPAddress> {
-                    IPAddress.Parse("10.239.24.6"),
-                    IPAddress.Parse("10.239.24.7"),
-                    IPAddress.Parse("10.239.24.8"),
-                    IPAddress.Parse("10.239.24.15"),
-                    IPAddress.Parse("10.239.24.16"),
-                    IPAddress.Parse("10.239.24.17")
-                };
+                var loggerFactory = new LoggerFactory();
+                loggerFactory.AddNLog();
+                var dictionary = new RadiusDictionary(Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + "\\content\\radius.dictionary", loggerFactory.CreateLogger<RadiusDictionary>());
 
 
-                var mbbNewSecret = CloudConfigurationManager.GetSetting("mbbnewsecret");
-                _authenticationServer.AddPacketHandler(remoteAddresses, mbbNewSecret, mbbPacketHandlerV2);
-                _accountingServer.AddPacketHandler(remoteAddresses, mbbNewSecret, mbbPacketHandlerV2);
+                var radiusPacketParser = new RadiusPacketParser(loggerFactory.CreateLogger<RadiusPacketParser>(), dictionary);
+                var packetHandler = new TestPacketHandler();
+                var repository = new PacketHandlerRepository();
 
-                _log.Info("Configuration read");
+                repository.AddPacketHandler(IPAddress.Parse("127.0.0.1"), packetHandler, "secret");
+
+                _authenticationServer = new RadiusServer(
+                    new Net.UdpClientFactory(),
+                    new IPEndPoint(IPAddress.Any, 1812),
+                    radiusPacketParser,
+                    RadiusServerType.Authentication,
+                    repository,
+                    loggerFactory.CreateLogger<RadiusServer>());
+
+
+                //  _log.Info("Configuration read");
 
                 _authenticationServer.Start();
-                _accountingServer.Start();
+                //  _log.Info("Server started");
+
             }
             catch (Exception ex)
             {
-                _log.Fatal("Failed to start service", ex);
+                //  _log.Fatal("Failed to start service", ex);
                 throw;
             }
         }
@@ -97,8 +66,6 @@ namespace Flexinets.Radius
         {
             _authenticationServer?.Stop();
             _authenticationServer?.Dispose();
-            _accountingServer?.Stop();
-            _accountingServer?.Dispose();
         }
     }
 }

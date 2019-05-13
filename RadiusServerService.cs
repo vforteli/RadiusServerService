@@ -1,7 +1,5 @@
 ﻿using Flexinets.Radius.Core;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
-using NLog;
 using NLog.Extensions.Logging;
 using System;
 using System.Diagnostics;
@@ -15,7 +13,7 @@ namespace Flexinets.Radius
     public partial class RadiusServerService : ServiceBase
     {
         private RadiusServer _authenticationServer;
-
+        private NLog.Logger _log = NLog.LogManager.GetCurrentClassLogger();
 
         public RadiusServerService()
         {
@@ -26,8 +24,8 @@ namespace Flexinets.Radius
         {
             try
             {
-                //   _log.Info($"Starting RadiusServerService build version {FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion}");
-                //   _log.Info("Reading configuration");
+                _log.Info($"Starting RadiusServerService build version {FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion}");
+                _log.Info("Reading configuration");
 
                 var loggerFactory = new LoggerFactory();
                 loggerFactory.AddNLog();
@@ -49,15 +47,13 @@ namespace Flexinets.Radius
                     loggerFactory.CreateLogger<RadiusServer>());
 
 
-                //  _log.Info("Configuration read");
+                _log.Info("Configuration read");
 
                 _authenticationServer.Start();
-                //  _log.Info("Server started");
-
             }
             catch (Exception ex)
             {
-                //  _log.Fatal("Failed to start service", ex);
+                _log.Fatal(ex, "Failed to start service");
                 throw;
             }
         }

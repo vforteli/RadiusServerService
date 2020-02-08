@@ -4,6 +4,8 @@ using System.IO;
 using System.Net;
 using System.ServiceProcess;
 using Flexinets.Radius.Core;
+using Microsoft.Extensions.Logging.Abstractions;
+using Flexinets.Net;
 
 namespace Flexinets.Radius
 {
@@ -24,17 +26,29 @@ namespace Flexinets.Radius
             log4net.Config.XmlConfigurator.Configure();
             try
             {
-                _log.Info("Reading configuration");
-                var path = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + "\\dictionary";
-                var dictionary = new RadiusDictionary(path);
-                _log.Info("Configuration read");
-
-                _authenticationServer = new RadiusServer(new IPEndPoint(IPAddress.Any, 1812), dictionary, RadiusServerType.Authentication);
-                _accountingServer = new RadiusServer(new IPEndPoint(IPAddress.Any, 1813), dictionary, RadiusServerType.Accounting);
-
+                var path = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + "/Content/radius.dictionary";
+                var dictionary = new RadiusDictionary(path, NullLogger<RadiusDictionary>.Instance);
+                var radiusPacketParser = new RadiusPacketParser(NullLogger<RadiusPacketParser>.Instance, dictionary);
                 var packetHandler = new TestPacketHandler();
-                _authenticationServer.AddPacketHandler(IPAddress.Parse("127.0.0.1"), "secret", packetHandler);
-                _accountingServer.AddPacketHandler(IPAddress.Parse("127.0.0.1"), "secret", packetHandler);
+                var repository = new PacketHandlerRepository();
+                var udpClientFactory = new UdpClientFactory();
+                repository.AddPacketHandler(IPAddress.Any, packetHandler, "secret");
+
+                _authenticationServer = new RadiusServer(
+                    udpClientFactory,
+                    new IPEndPoint(IPAddress.Any, 1812),
+                    radiusPacketParser,
+                    RadiusServerType.Authentication,
+                    repository,
+                    NullLogger<RadiusServer>.Instance);
+
+                _accountingServer = new RadiusServer(
+                   udpClientFactory,
+                   new IPEndPoint(IPAddress.Any, 1813),
+                   radiusPacketParser,
+                   RadiusServerType.Accounting,
+                   repository,
+                   NullLogger<RadiusServer>.Instance);
 
                 _authenticationServer.Start();
                 _accountingServer.Start();
